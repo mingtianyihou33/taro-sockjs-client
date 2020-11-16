@@ -1,0 +1,55 @@
+{
+  "name": "taro-sockjs-client",
+  "version": "1.0.0",
+  "description": "sockjs-client for Taro",
+  "keywords": [
+    "sockjs-client",
+    "taro",
+    "websocket",
+    "sockjs"
+  ],
+  "scripts": {
+    "build": "node build/build.js",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
+    "test": "mocha --require @babel/register test/*.js",
+    "prettier": "prettier --write ."
+  },
+  "main": "dist/taro-sockjs-client.common.js",
+  "module": "dist/taro-sockjs-client.esm.js",
+  "unpkg": "dist/taro-sockjs-client.js",
+  "repository": "https://github.com/mingtianyihou33/taro-sockjs-client.git",
+  "author": "mingtianyihou33 <liumingyi1428@126.com>",
+  "license": "MIT",
+  "dependencies": {
+    "eventsource": "^1.0.7",
+    "inherits": "^2.0.4",
+    "json3": "^3.3.3",
+    "url-parse": "^1.4.7"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/register": "^7.8.3",
+    "@tarojs/taro": "^3.0.16",
+    "conventional-changelog-cli": "^2.0.34",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.5.1",
+    "mocha": "^7.0.0",
+    "ora": "^4.0.3",
+    "prettier": "^2.1.2",
+    "rollup": "^1.29.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}
