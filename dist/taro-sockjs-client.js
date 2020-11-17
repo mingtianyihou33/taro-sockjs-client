@@ -917,7 +917,6 @@
 
     this.url = url;
     this.ws = await new WebsocketDriver(this.url, [], options);
-    console.log('this.ws', this.ws);
     this.ws.onMessage(function (e) {
       debug('message event', e.data);
       self.emit('message', e.data);
