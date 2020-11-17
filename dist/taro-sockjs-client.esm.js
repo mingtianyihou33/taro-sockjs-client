@@ -708,7 +708,10 @@ Url.qs = querystringify_1;
 
 var urlParse = Url;
 
-function debug (...args) {// console.log(...args)
+function debug (...args) {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(...args);
+  }
 }
 
 var urlUtils = {
@@ -733,6 +736,7 @@ var urlUtils = {
   },
   isOriginEqual: function (a, b) {
     let res = this.getOrigin(a) === this.getOrigin(b);
+    debug('same', a, b, res);
     return res;
   },
   isSchemeEqual: function (a, b) {
@@ -898,6 +902,7 @@ async function TaroWebSocketTransport(transUrl, ignore, options) {
   }
 
   EventEmitter.call(this);
+  debug('constructor', transUrl);
   let self = this;
   let url = urlUtils.addPath(transUrl, '/websocket');
 
@@ -920,6 +925,7 @@ async function TaroWebSocketTransport(transUrl, ignore, options) {
   // https://bugzilla.mozilla.org/show_bug.cgi?id=696085
 
   this.unloadRef = eventUtils.unloadAdd(function () {
+    debug('unload');
     self.ws.close();
   });
   this.ws.onClose(function (e) {
@@ -929,6 +935,7 @@ async function TaroWebSocketTransport(transUrl, ignore, options) {
     self._cleanup();
   });
   this.ws.onError(function (e) {
+    debug('error event', e);
     self.emit('close', 1006, 'WebSocket connection broken');
 
     self._cleanup();
@@ -940,12 +947,14 @@ inherits(TaroWebSocketTransport, EventEmitter);
 
 TaroWebSocketTransport.prototype.send = function (data) {
   let msg = '[' + data + ']';
+  debug('send', msg);
   this.ws.send({
     data: msg
   });
 };
 
 TaroWebSocketTransport.prototype.close = function () {
+  debug('close');
   let ws = this.ws;
 
   this._cleanup();
@@ -956,6 +965,7 @@ TaroWebSocketTransport.prototype.close = function () {
 };
 
 TaroWebSocketTransport.prototype._cleanup = function () {
+  debug('_cleanup');
   let ws = this.ws;
 
   if (ws) {
@@ -968,6 +978,7 @@ TaroWebSocketTransport.prototype._cleanup = function () {
 };
 
 TaroWebSocketTransport.enabled = function () {
+  debug('enabled');
   return !!WebsocketDriver;
 };
 
@@ -2440,6 +2451,7 @@ function transport (availableTransports) {
         }
 
         if (trans.transportName === 'websocket' && info.websocket === false) {
+          debug('disabled from server', 'websocket');
           return;
         }
 
@@ -2671,6 +2683,7 @@ const http = require('http');
 const https = require('https');
 
 function XhrDriver(method, url, payload, opts) {
+  debug(method, url, payload);
   let self = this;
   EventEmitter.call(this);
   let parsedUrl = new urlParse(url);
@@ -2687,15 +2700,18 @@ function XhrDriver(method, url, payload, opts) {
     res.setEncoding('utf8');
     let responseText = '';
     res.on('data', function (chunk) {
+      debug('data', chunk);
       responseText += chunk;
       self.emit('chunk', 200, responseText);
     });
     res.once('end', function () {
+      debug('end');
       self.emit('finish', res.statusCode, responseText);
       self.req = null;
     });
   });
   this.req.on('error', function (e) {
+    debug('error', e);
     self.emit('finish', 0, e.message);
   });
 
@@ -2709,6 +2725,7 @@ function XhrDriver(method, url, payload, opts) {
 inherits(XhrDriver, EventEmitter);
 
 XhrDriver.prototype.close = function () {
+  debug('close');
   this.removeAllListeners();
 
   if (this.req) {
@@ -2771,6 +2788,7 @@ function InfoAjax(url, AjaxObject) {
         try {
           info = json3.parse(text);
         } catch (e) {
+          debug('bad json', text);
         }
       }
 
@@ -2792,6 +2810,7 @@ InfoAjax.prototype.close = function () {
 };
 
 function InfoReceiver(baseUrl, urlInfo) {
+  debug(baseUrl);
   let self = this;
   EventEmitter.call(this);
   setTimeout(function () {
@@ -2821,14 +2840,17 @@ InfoReceiver._getReceiver = function (baseUrl, url, urlInfo) {
 InfoReceiver.prototype.doXhr = function (baseUrl, urlInfo) {
   let self = this,
       url = urlUtils.addPath(baseUrl, '/info');
+  debug('doXhr', url);
   this.xo = InfoReceiver._getReceiver(baseUrl, url, urlInfo);
   this.timeoutRef = setTimeout(function () {
+    debug('timeout');
 
     self._cleanup(false);
 
     self.emit('finish');
   }, InfoReceiver.timeout);
   this.xo.once('finish', function (info, rtt) {
+    debug('finish', info, rtt);
 
     self._cleanup(true);
 
@@ -2837,6 +2859,7 @@ InfoReceiver.prototype.doXhr = function (baseUrl, urlInfo) {
 };
 
 InfoReceiver.prototype._cleanup = function (wasClean) {
+  debug('_cleanup');
   clearTimeout(this.timeoutRef);
   this.timeoutRef = null;
 
@@ -2848,6 +2871,7 @@ InfoReceiver.prototype._cleanup = function (wasClean) {
 };
 
 InfoReceiver.prototype.close = function () {
+  debug('close');
   this.removeAllListeners();
 
   this._cleanup(false);
@@ -2855,7 +2879,7 @@ InfoReceiver.prototype.close = function () {
 
 InfoReceiver.timeout = 8000;
 
-var version = "1.0.0";
+var version = "1.0.2";
 
 var iframeUtils = {
   WPrefix: '_jp',
@@ -2873,6 +2897,8 @@ var iframeUtils = {
         type: type,
         data: data || ''
       }), '*');
+    } else {
+      debug('Cannot postMessage, no parent window.', type, data);
     }
   },
   createIframe: function (iframeUrl, errorCallback) {
@@ -2880,6 +2906,7 @@ var iframeUtils = {
     let tref, unloadRef;
 
     let unattach = function () {
+      debug('unattach');
       clearTimeout(tref); // Explorer had problems with that.
 
       try {
@@ -2891,6 +2918,7 @@ var iframeUtils = {
     };
 
     let cleanup = function () {
+      debug('cleanup');
 
       if (iframe) {
         unattach(); // This timeout makes chrome fire onbeforeunload event
@@ -2909,6 +2937,7 @@ var iframeUtils = {
     };
 
     let onerror = function (err) {
+      debug('onerror', err);
 
       if (iframe) {
         cleanup();
@@ -2917,6 +2946,7 @@ var iframeUtils = {
     };
 
     let post = function (msg, origin) {
+      debug('post', msg, origin);
       setTimeout(function () {
         try {
           // When the iframe is not loaded, IE raises an exception
@@ -2938,6 +2968,7 @@ var iframeUtils = {
     };
 
     iframe.onload = function () {
+      debug('onload'); // `onload` is triggered before scripts on the iframe are
       // executed. Give it few seconds to actually load stuff.
 
       clearTimeout(tref);
@@ -2981,6 +3012,7 @@ var iframeUtils = {
     };
 
     let onerror = function (r) {
+      debug('onerror', r);
 
       if (doc) {
         cleanup();
@@ -3132,6 +3164,7 @@ function iframeBootstrap (SockJS, availableTransports) {
           let transport = p[1];
           let transUrl = p[2];
           let baseUrl = p[3];
+          debug(version, transport, transUrl, baseUrl); // change this to semver logic
 
           if (version !== SockJS.version) {
             throw new Error('Incompatible SockJS! Main site uses:' + ' "' + version + '", the iframe:' + ' "' + SockJS.version + '".');
@@ -3316,6 +3349,7 @@ SockJS.CLOSING = 2;
 SockJS.CLOSED = 3;
 
 SockJS.prototype._receiveInfo = function (info, rtt) {
+  debug('_receiveInfo', rtt);
   this._ir = null;
 
   if (!info) {
@@ -3330,6 +3364,7 @@ SockJS.prototype._receiveInfo = function (info, rtt) {
 
   this._transUrl = info.base_url ? info.base_url : this.url;
   info = objectUtils.extend(info, this._urlInfo);
+  debug('info', info); // determine list of desired and supported transports
 
   let enabledTransports = transports.filterToEnabled(this._transportsWhitelist, info);
   this._transports = enabledTransports.main;
@@ -3344,6 +3379,7 @@ SockJS.prototype._connect = async function () {
 
     if (Transport.needBody) {
       if (!global.document.body || typeof global.document.readyState !== 'undefined' && global.document.readyState !== 'complete' && global.document.readyState !== 'interactive') {
+        debug('waiting for body');
 
         this._transports.unshift(Transport);
 
@@ -3361,6 +3397,7 @@ SockJS.prototype._connect = async function () {
 
     let transportUrl = urlUtils.addPath(this._transUrl, '/' + this._server + '/' + this._generateSessionId());
     let options = this._transportOptions[Transport.transportName];
+    debug('transport url', transportUrl);
     let transportObj = new Transport(transportUrl, this._transUrl, options);
 
     if (transportObj.then) {
@@ -3383,6 +3420,7 @@ SockJS.prototype._connect = async function () {
 };
 
 SockJS.prototype._transportTimeout = function () {
+  debug('_transportTimeout');
 
   if (this.readyState === SockJS.CONNECTING) {
     if (this._transport) {
@@ -3394,6 +3432,7 @@ SockJS.prototype._transportTimeout = function () {
 };
 
 SockJS.prototype._transportMessage = function (msg) {
+  debug('_transportMessage', msg);
   let self = this,
       type = msg.slice(0, 1),
       content = msg.slice(1),
@@ -3415,10 +3454,12 @@ SockJS.prototype._transportMessage = function (msg) {
     try {
       payload = json3.parse(content);
     } catch (e) {
+      debug('bad json', content);
     }
   }
 
   if (typeof payload === 'undefined') {
+    debug('empty payload', content);
     return;
   }
 
@@ -3523,6 +3564,7 @@ SockJS.prototype._close = function (code, reason, wasClean) {
     e.reason = reason;
     this.dispatchEvent(e);
     this.onmessage = this.onclose = this.onerror = null;
+    debug('disconnected');
   }.bind(this), 0);
 }; // See: http://www.erg.abdn.ac.uk/~gerrit/dccp/notes/ccid2/rto_estimator/
 // and RFC 2988.
