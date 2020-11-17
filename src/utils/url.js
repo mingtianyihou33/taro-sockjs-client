@@ -1,6 +1,5 @@
 import URL from 'url-parse'
-
-let debug = function () {}
+import debug from '../utils/debug'
 
 export default {
   getOrigin: function (url) {

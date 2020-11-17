@@ -1,8 +1,6 @@
 import eventUtils from './event'
 import JSON3 from 'json3'
-import browser from './browser'
-
-let debug = function () {}
+import debug from '../utils/debug'
 
 export default {
   WPrefix: '_jp',

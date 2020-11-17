@@ -1,7 +1,6 @@
 import random from '../../utils/random'
 import urlUtils from '../../utils/url'
-
-let debug = function () {}
+import debug from '../../utils/debug'
 
 let form, area
 

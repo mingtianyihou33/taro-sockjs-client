@@ -1,9 +1,9 @@
 import EventEmitter from '../../event/emitter'
 import inherits from '../../utils/inherits'
 import URL from 'url-parse'
+import debug from '../../utils/debug'
 const http = require('http')
 const https = require('https')
-let debug = function () {}
 
 function XhrDriver(method, url, payload, opts) {
   debug(method, url, payload)

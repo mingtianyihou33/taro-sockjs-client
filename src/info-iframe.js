@@ -4,8 +4,7 @@ import JSON3 from 'json3'
 import utils from './utils/event'
 import IframeTransport from './transport/iframe'
 import InfoReceiverIframe from './info-iframe-receiver'
-
-let debug = function () {}
+import debug from './utils/debug'
 
 function InfoIframe(baseUrl, url) {
   let self = this

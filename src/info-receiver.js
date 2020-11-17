@@ -6,7 +6,7 @@ import XHRCors from './transport/sender/xhr-cors'
 import XHRLocal from './transport/sender/xhr-local'
 import XHRFake from './transport/sender/xhr-fake'
 import InfoAjax from './info-ajax'
-let debug = function () {}
+import debug from './utils/debug'
 
 function InfoReceiver(baseUrl, urlInfo) {
   debug(baseUrl)

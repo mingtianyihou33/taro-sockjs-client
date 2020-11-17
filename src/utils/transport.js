@@ -1,4 +1,4 @@
-let debug = function () {}
+import debug from '../utils/debug'
 
 export default function (availableTransports) {
   return {

@@ -5,8 +5,7 @@ import FacadeJS from './facade'
 import InfoIframeReceiver from './info-iframe-receiver'
 import iframeUtils from './utils/iframe'
 import loc from './location'
-
-let debug = function () {}
+import debug from './utils/debug'
 
 export default function (SockJS, availableTransports) {
   let transportMap = {}

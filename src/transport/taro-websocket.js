@@ -3,14 +3,14 @@ import utils from '../utils/event'
 import urlUtils from '../utils/url'
 import inherits from '../utils/inherits'
 import EventEmitter from '../event/emitter'
+import debug from '../utils/debug'
 
 function WebsocketDriver(url, protocols, options) {
   return Taro.connectSocket({ url, protocols, ...options })
 }
-let debug = function () {}
 
-async function WebSocketTransport(transUrl, ignore, options) {
-  if (!WebSocketTransport.enabled()) {
+async function TaroWebSocketTransport(transUrl, ignore, options) {
+  if (!TaroWebSocketTransport.enabled()) {
     throw new Error('Transport created when disabled')
   }
 
@@ -27,10 +27,10 @@ async function WebSocketTransport(transUrl, ignore, options) {
   this.url = url
   this.ws = await new WebsocketDriver(this.url, [], options)
   console.log('this.ws', this.ws)
-  this.ws.onmessage = function (e) {
+  this.ws.onMessage(function (e) {
     debug('message event', e.data)
     self.emit('message', e.data)
-  }
+  })
   // Firefox has an interesting bug. If a websocket connection is
   // created after onunload, it stays alive even when user
   // navigates away from the page. In such situation let's lie -
@@ -41,27 +41,28 @@ async function WebSocketTransport(transUrl, ignore, options) {
     debug('unload')
     self.ws.close()
   })
-  this.ws.onclose = function (e) {
+  this.ws.onClose(function (e) {
     debug('close event', e.code, e.reason)
     self.emit('close', e.code, e.reason)
     self._cleanup()
-  }
-  this.ws.onerror = function (e) {
+  })
+  this.ws.onError(function (e) {
     debug('error event', e)
     self.emit('close', 1006, 'WebSocket connection broken')
     self._cleanup()
-  }
+  })
+  return this
 }
 
-inherits(WebSocketTransport, EventEmitter)
+inherits(TaroWebSocketTransport, EventEmitter)
 
-WebSocketTransport.prototype.send = function (data) {
+TaroWebSocketTransport.prototype.send = function (data) {
   let msg = '[' + data + ']'
   debug('send', msg)
-  this.ws.send(msg)
+  this.ws.send({ data: msg })
 }
 
-WebSocketTransport.prototype.close = function () {
+TaroWebSocketTransport.prototype.close = function () {
   debug('close')
   let ws = this.ws
   this._cleanup()
@@ -70,7 +71,7 @@ WebSocketTransport.prototype.close = function () {
   }
 }
 
-WebSocketTransport.prototype._cleanup = function () {
+TaroWebSocketTransport.prototype._cleanup = function () {
   debug('_cleanup')
   let ws = this.ws
   if (ws) {
@@ -81,16 +82,16 @@ WebSocketTransport.prototype._cleanup = function () {
   this.removeAllListeners()
 }
 
-WebSocketTransport.enabled = function () {
+TaroWebSocketTransport.enabled = function () {
   debug('enabled')
   return !!WebsocketDriver
 }
-WebSocketTransport.transportName = 'websocket'
+TaroWebSocketTransport.transportName = 'taroWebsocket'
 
 // In theory, ws should require 1 round trip. But in chrome, this is
 // not very stable over SSL. Most likely a ws connection requires a
 // separate SSL connection, in which case 2 round trips are an
 // absolute minumum.
-WebSocketTransport.roundTrips = 2
+TaroWebSocketTransport.roundTrips = 2
 
-export default WebSocketTransport
+export default TaroWebSocketTransport

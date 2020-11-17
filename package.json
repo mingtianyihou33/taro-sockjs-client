@@ -14,9 +14,8 @@
     "test": "mocha --require @babel/register test/*.js",
     "prettier": "prettier --write ."
   },
-  "main": "dist/taro-sockjs-client.common.js",
+  "main": "dist/taro-sockjs-client.js",
   "module": "dist/taro-sockjs-client.esm.js",
-  "unpkg": "dist/taro-sockjs-client.js",
   "repository": "https://github.com/mingtianyihou33/taro-sockjs-client.git",
   "author": "mingtianyihou33 <liumingyi1428@126.com>",
   "license": "MIT",
@@ -30,6 +29,10 @@
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.10.4",
     "@babel/register": "^7.8.3",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@rollup/plugin-commonjs": "^16.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^10.0.0",
     "@tarojs/taro": "^3.0.16",
     "conventional-changelog-cli": "^2.0.34",
     "husky": "^4.3.0",
@@ -37,11 +40,7 @@
     "mocha": "^7.0.0",
     "ora": "^4.0.3",
     "prettier": "^2.1.2",
-    "rollup": "^1.29.0",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^5.2.0"
+    "rollup": "^2.30.0"
   },
   "husky": {
     "hooks": {

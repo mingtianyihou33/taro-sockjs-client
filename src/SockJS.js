@@ -18,8 +18,7 @@ import TransportMessageEvent from './event/trans-message'
 import InfoReceiver from './info-receiver'
 import version from './version'
 import iframeBootstrap from './iframe-bootstrap'
-
-let debug = function () {}
+import debug from './utils/debug'
 
 let transports
 
@@ -238,11 +237,11 @@ SockJS.prototype._connect = async function () {
       this._timeout,
       this._rto * Transport.roundTrips || 5000,
     )
-    this._transportTimeoutId = setTimeout(
-      this._transportTimeout.bind(this),
-      timeoutMs,
-    )
-    debug('using timeout', timeoutMs)
+    // this._transportTimeoutId = setTimeout(
+    //   this._transportTimeout.bind(this),
+    //   timeoutMs,
+    // )
+    // debug('using timeout', timeoutMs)
 
     let transportUrl = urlUtils.addPath(
       this._transUrl,
@@ -250,16 +249,19 @@ SockJS.prototype._connect = async function () {
     )
     let options = this._transportOptions[Transport.transportName]
     debug('transport url', transportUrl)
-    let transportObj = await new Transport(
-      transportUrl,
-      this._transUrl,
-      options,
-    )
-    transportObj.on('message', this._transportMessage.bind(this))
-    transportObj.once('close', this._transportClose.bind(this))
+    let transportObj = new Transport(transportUrl, this._transUrl, options)
+    if (transportObj.then) {
+      transportObj.then((transportObj) => {
+        transportObj.on('message', this._transportMessage.bind(this))
+        transportObj.once('close', this._transportClose.bind(this))
+        this._transport = transportObj
+      })
+    } else {
+      transportObj.on('message', this._transportMessage.bind(this))
+      transportObj.once('close', this._transportClose.bind(this))
+      this._transport = transportObj
+    }
     transportObj.transportName = Transport.transportName
-    this._transport = transportObj
-
     return
   }
   this._close(2000, 'All transports failed', false)

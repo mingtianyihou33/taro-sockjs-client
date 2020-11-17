@@ -54,17 +54,3 @@ export default {
     }
   },
 }
-
-let unloadTriggered = function () {
-  if (afterUnload) {
-    return
-  }
-  afterUnload = true
-  module.exports.triggerUnloadCallbacks()
-}
-
-// 'unload' alone is not reliable in opera within an iframe, but we
-// can't use `beforeunload` as IE fires it on javascript: links.
-if (!isChromePackagedApp) {
-  module.exports.attachEvent('unload', unloadTriggered)
-}
