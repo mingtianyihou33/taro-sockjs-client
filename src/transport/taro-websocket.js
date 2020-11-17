@@ -1,8 +1,8 @@
 import Taro from '@tarojs/taro'
 import utils from '../utils/event'
 import urlUtils from '../utils/url'
-import inherits from 'inherits'
-import { EventEmitter } from 'events'
+import inherits from '../utils/inherits'
+import EventEmitter from '../event/emitter'
 
 function WebsocketDriver(url, protocols, options) {
   return Taro.connectSocket({ url, protocols, ...options })

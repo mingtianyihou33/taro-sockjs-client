@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from '../utils/browser-crypto'
 
 // This string has length 32, a power of 2, so the modulus doesn't introduce a
 // bias.

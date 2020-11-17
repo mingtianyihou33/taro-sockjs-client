@@ -1,6 +1,6 @@
 import './shims'
 import URL from 'url-parse'
-import inherits from 'inherits'
+import inherits from './utils/inherits'
 import JSON3 from 'json3'
 import random from './utils/random'
 import escape from './utils/escape'
@@ -212,7 +212,7 @@ SockJS.prototype._receiveInfo = function (info, rtt) {
   this._connect()
 }
 
-SockJS.prototype._connect = function () {
+SockJS.prototype._connect = async function () {
   for (
     let Transport = this._transports.shift();
     Transport;
@@ -250,7 +250,11 @@ SockJS.prototype._connect = function () {
     )
     let options = this._transportOptions[Transport.transportName]
     debug('transport url', transportUrl)
-    let transportObj = new Transport(transportUrl, this._transUrl, options)
+    let transportObj = await new Transport(
+      transportUrl,
+      this._transUrl,
+      options,
+    )
     transportObj.on('message', this._transportMessage.bind(this))
     transportObj.once('close', this._transportClose.bind(this))
     transportObj.transportName = Transport.transportName

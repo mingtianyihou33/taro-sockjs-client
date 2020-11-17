@@ -1,5 +1,5 @@
-import { EventEmitter } from 'events'
-import inherits from 'inherits'
+import EventEmitter from './event/emitter'
+import inherits from './utils/inherits'
 import JSON3 from 'json3'
 import objectUtils from './utils/object'
 let debug = function () {}

@@ -1,11 +1,10 @@
-import { EventEmitter } from 'events'
-import inherits from 'inherits'
+import EventEmitter from './event/emitter'
+import inherits from './utils/inherits'
 import urlUtils from './utils/url'
 import XDR from './transport/sender/xdr'
 import XHRCors from './transport/sender/xhr-cors'
 import XHRLocal from './transport/sender/xhr-local'
 import XHRFake from './transport/sender/xhr-fake'
-import InfoIframe from './info-iframe'
 import InfoAjax from './info-ajax'
 let debug = function () {}
 
@@ -33,9 +32,6 @@ InfoReceiver._getReceiver = function (baseUrl, url, urlInfo) {
   }
   if (XDR.enabled && urlInfo.sameScheme) {
     return new InfoAjax(url, XDR)
-  }
-  if (InfoIframe.enabled()) {
-    return new InfoIframe(baseUrl, url)
   }
   return new InfoAjax(url, XHRFake)
 }

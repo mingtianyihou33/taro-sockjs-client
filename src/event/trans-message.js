@@ -1,4 +1,4 @@
-import inherits from 'inherits'
+import inherits from '../utils/inherits'
 import Event from './event'
 function TransportMessageEvent(data) {
   Event.call(this)

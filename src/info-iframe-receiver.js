@@ -1,5 +1,5 @@
-import inherits from 'inherits'
-import { EventEmitter } from 'events'
+import inherits from './utils/inherits'
+import EventEmitter from './event/emitter'
 import JSON3 from 'json3'
 import XHRLocalObject from './transport/sender/xhr-local'
 import InfoAjax from './info-ajax'

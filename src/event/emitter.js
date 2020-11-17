@@ -1,5 +1,6 @@
-import inherits from 'inherits'
+import inherits from '../utils/inherits'
 import EventTarget from './eventtarget'
+
 function EventEmitter() {
   EventTarget.call(this)
 }
@@ -52,4 +53,4 @@ EventEmitter.prototype.on = EventEmitter.prototype.addListener =
 EventEmitter.prototype.removeListener =
   EventTarget.prototype.removeEventListener
 
-module.exports.EventEmitter = EventEmitter
+export default EventEmitter
