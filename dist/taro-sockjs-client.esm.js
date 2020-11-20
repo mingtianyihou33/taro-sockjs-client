@@ -710,7 +710,7 @@ var urlParse = Url;
 
 function debug (...args) {
   if (process.env.NODE_ENV !== 'production') {
-    console.log(...args);
+    console.debug(...args);
   }
 }
 
@@ -2879,7 +2879,7 @@ InfoReceiver.prototype.close = function () {
 
 InfoReceiver.timeout = 8000;
 
-var version = "1.0.2";
+var version = "1.0.3";
 
 var iframeUtils = {
   WPrefix: '_jp',
