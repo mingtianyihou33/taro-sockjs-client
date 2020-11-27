@@ -708,11 +708,9 @@ Url.qs = querystringify_1;
 
 var urlParse = Url;
 
-function debug (...args) {
-  if (process.env.NODE_ENV !== 'production') {
-    console.debug(...args);
-  }
-}
+const debug = function () {
+  return process.env.NODE_ENV !== 'production' ? console.debug.bind(console) : function () {};
+}();
 
 var urlUtils = {
   getOrigin: function (url) {
