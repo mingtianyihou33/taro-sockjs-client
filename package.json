@@ -1,6 +1,6 @@
 {
   "name": "taro-sockjs-client",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "sockjs-client for Taro",
   "keywords": [
     "sockjs-client",
